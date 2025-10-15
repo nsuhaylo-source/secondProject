@@ -27,3 +27,76 @@ async function fetchRandomCoffee() {
     coffeeBlock.innerHTML = "<p class='placeholder'>Не удалось загрузить кофе ☹️</p>";
   }
 }
+
+function renderCoffee(coffee) {
+  coffeeBlock.innerHTML = "";
+
+  if (coffee.image) {
+    const img = document.createElement("img");
+    img.src = coffee.image;
+    img.alt = coffee.title;
+    img.className = "coffee-img";
+    coffeeBlock.appendChild(img);
+  }
+
+  const title = document.createElement("p");
+  title.className = "coffee-title";
+  title.textContent = coffee.title;
+  coffeeBlock.appendChild(title);
+
+  const desc = document.createElement("p");
+  desc.className = "coffee-desc";
+  desc.textContent = coffee.description || "Описание отсутствует.";
+  coffeeBlock.appendChild(desc);
+
+  const region = document.createElement("p");
+  region.className = "coffee-region";
+  region.textContent = "Регион: " + (coffee.region || "неизвестен");
+  coffeeBlock.appendChild(region);
+}
+
+function addToFavorites() {
+  if (!currentCoffee) return;
+
+  const favorite = {
+    title: currentCoffee.title,
+    date: new Date().toLocaleString("ru-RU"),
+  };
+
+  favorites.push(favorite);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(favorites));
+  renderFavorites();
+}
+
+
+function renderFavorites() {
+  favoritesList.innerHTML = "";
+
+  if (favorites.length === 0) {
+    favoritesList.innerHTML = "<p class='placeholder'>Избранное пустое</p>";
+    return;
+  }
+
+  favorites.forEach((fav) => {
+    const li = document.createElement("li");
+
+    const title = document.createElement("span");
+    title.className = "favorite-title";
+    title.textContent = fav.title;
+
+    const date = document.createElement("span");
+    date.className = "favorite-date";
+    date.textContent = fav.date;
+
+    li.appendChild(title);
+    li.appendChild(date);
+    favoritesList.appendChild(li);
+  });
+}
+
+
+getCoffeeBtn.addEventListener("click", fetchRandomCoffee);
+addFavoriteBtn.addEventListener("click", addToFavorites);
+
+
+renderFavorites();
