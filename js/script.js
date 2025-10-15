@@ -59,11 +59,19 @@ function addToFavorites() {
   if (!currentCoffee) return;
 
   const favorite = {
+    id: Date.now(), 
     title: currentCoffee.title,
     date: new Date().toLocaleString("ru-RU"),
   };
 
   favorites.push(favorite);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(favorites));
+  renderFavorites();
+}
+
+
+function removeFromFavorites(id) {
+  favorites = favorites.filter(fav => fav.id !== id);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(favorites));
   renderFavorites();
 }
@@ -77,19 +85,28 @@ function renderFavorites() {
     return;
   }
 
-  favorites.forEach((fav) => {
+  favorites.forEach(f => {
     const li = document.createElement("li");
+    li.className = "fav-item";
 
     const title = document.createElement("span");
     title.className = "favorite-title";
-    title.textContent = fav.title;
+    title.textContent = f.title;
+
+    const right = document.createElement("div");
+    right.className = "fav-right";
 
     const date = document.createElement("span");
     date.className = "favorite-date";
-    date.textContent = fav.date;
+    date.textContent = f.date;
 
-    li.appendChild(title);
-    li.appendChild(date);
+    const removeBtn = document.createElement("button");
+    removeBtn.textContent = "Удалить";
+    removeBtn.className = "btn btn-remove";
+    removeBtn.addEventListener("click", () => removeFromFavorites(f.id));
+
+    right.append(date, removeBtn);
+    li.append(title, right);
     favoritesList.appendChild(li);
   });
 }
